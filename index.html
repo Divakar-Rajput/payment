@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Pay Receipt Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #222;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 12px 40px;
+        }
+
+        h2 {
+            color: #ccc;
+            font-size: 13px;
+            font-weight: 400;
+            margin-bottom: 14px;
+            letter-spacing: .3px;
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 430px;
+        }
+
+        .sec {
+            background: #1c1c1e;
+            border: 1px solid #2a2a2a;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .sec-lbl {
+            font-size: 10px;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            margin-bottom: 10px;
+        }
+
+        .fg {
+            margin-bottom: 8px;
+        }
+
+        .fg:last-child {
+            margin-bottom: 0;
+        }
+
+        .fg label {
+            display: block;
+            font-size: 11px;
+            color: #666;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .fg input {
+            width: 100%;
+            background: #111;
+            border: 1px solid #2c2c2c;
+            border-radius: 9px;
+            padding: 8px 11px;
+            color: #f0f0f0;
+            font-size: 13px;
+            font-family: 'Roboto', sans-serif;
+            outline: none;
+        }
+
+        .fg input:focus {
+            border-color: #444;
+        }
+
+        .genbtn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            background: #1a73e8;
+            margin-bottom: 16px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .result {
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .preview {
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 11px;
+            line-height: 0;
+        }
+
+        .preview img {
+            width: 100%;
+            display: block;
+        }
+
+        .dlbtn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 11px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            background: #1a73e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            margin-bottom: 9px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .newbtn {
+            width: 100%;
+            padding: 12px;
+            background: #1c1c1e;
+            border: 1px solid #3a3a3a;
+            border-radius: 11px;
+            color: #e0e0e0;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* upload area */
+        .upload-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .upload-box {
+            flex: 1;
+            background: #111;
+            border: 1px dashed #333;
+            border-radius: 9px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .upload-box input[type=file] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .upload-box span {
+            font-size: 11px;
+            color: #666;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .upload-box img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
+
+        .upload-lbl {
+            font-size: 11px;
+            color: #666;
+            font-weight: 500;
+            margin-bottom: 6px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <h2>Google Pay Receipt Generator</h2>
+
+        <div id="formEl">
+            <!-- Profile Photo -->
+            <div class="sec">
+                <div class="sec-lbl">Profile Photo &amp; Bank Logo</div>
+                <div class="upload-row">
+                    <div>
+                        <span class="upload-lbl">Profile Picture</span>
+                        <div class="upload-box" id="profBox">
+                            <input type="file" accept="image/*" onchange="previewImg(this,'profPrev','profBox')">
+                            <img id="profPrev" src="" style="display:none">
+                            <span id="profHint">Tap to upload</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="upload-lbl">Bank Logo</span>
+                        <div class="upload-box" id="bankBox">
+                            <input type="file" accept="image/*" onchange="previewImg(this,'bankPrev','bankBox')">
+                            <img id="bankPrev" src="" style="display:none">
+                            <span id="bankHint">Tap to upload</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipient -->
+            <div class="sec">
+                <div class="sec-lbl">Recipient</div>
+                <div class="fg"><label>Full Name (e.g. Imran Raza)</label><input id="rName" value="Imran Raza"></div>
+                <div class="fg"><label>Phone / UPI handle shown</label><input id="rPhone" value="+91 ••••• •2565"></div>
+                <div class="fg"><label>UPI ID</label><input id="rUpi" value="imranrazair785-1@okhdfcbank"></div>
+                <div class="fg"><label>UPI App (e.g. Google Pay)</label><input id="rApp" value="Google Pay"></div>
+            </div>
+
+            <!-- Transaction -->
+            <div class="sec">
+                <div class="sec-lbl">Transaction</div>
+                <div class="fg"><label>Amount (₹)</label><input id="amt" type="number" value="30" inputmode="decimal">
+                </div>
+                <div class="fg"><label>Date</label><input id="txDate" type="date"></div>
+                <div class="fg"><label>Time</label><input id="txTime" type="time"></div>
+                <div class="fg"><label>UPI Transaction ID <span
+                            style="color:#4a90d9;font-size:10px;font-weight:400;">(auto-generated)</span></label><input
+                        id="txnId" readonly style="color:#9aa0a6;cursor:default;"></div>
+            </div>
+
+            <!-- Sender -->
+            <div class="sec">
+                <div class="sec-lbl">Sender</div>
+                <div class="fg"><label>Full Name</label><input id="sName" value="DIVAKAR SINGH CHAUHAN"></div>
+                <div class="fg">
+                    <label>Bank Name</label>
+                    <select id="sBankSelect" onchange="onBankSelect()"
+                        style="width:100%;background:#111;border:1px solid #2c2c2c;border-radius:9px;padding:8px 11px;color:#f0f0f0;font-size:13px;font-family:'Roboto',sans-serif;outline:none;margin-bottom:6px;appearance:none;-webkit-appearance:none;cursor:pointer;">
+                        <option value="Slice Small Finance Bank">Slice Small Finance Bank</option>
+                        <option value="State Bank of India">State Bank of India</option>
+                        <option value="HDFC Bank">HDFC Bank</option>
+                        <option value="ICICI Bank">ICICI Bank</option>
+                        <option value="Axis Bank">Axis Bank</option>
+                        <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
+                        <option value="Punjab National Bank">Punjab National Bank</option>
+                        <option value="Bank of Baroda">Bank of Baroda</option>
+                        <option value="Canara Bank">Canara Bank</option>
+                        <option value="Union Bank of India">Union Bank of India</option>
+                        <option value="IndusInd Bank">IndusInd Bank</option>
+                        <option value="Yes Bank">Yes Bank</option>
+                        <option value="IDFC First Bank">IDFC First Bank</option>
+                        <option value="Federal Bank">Federal Bank</option>
+                        <option value="Paytm Payments Bank">Paytm Payments Bank</option>
+                        <option value="Airtel Payments Bank">Airtel Payments Bank</option>
+                        <option value="custom">✏️ Custom — type below</option>
+                    </select>
+                    <input id="sBank" value="Slice Small Finance Bank" placeholder="Bank name" style="display:none;">
+                </div>
+                <div class="fg"><label>Account Last 4 Digits</label><input id="sAcct" maxlength="4" value="2147"
+                        inputmode="numeric"></div>
+                <div class="fg"><label>Sender UPI ID</label><input id="sUpi" value="divakarrajput2004-1@okicici"></div>
+                <div class="fg"><label>Sender UPI App</label><input id="sApp" value="Google Pay"></div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="sec">
+                <div class="sec-lbl">Status Bar Time</div>
+                <div class="fg"><label>Time</label><input id="sbTime"></div>
+            </div>
+
+            <button class="genbtn" onclick="generate()">Generate Google Pay Receipt</button>
+        </div>
+
+        <div class="result" id="resultEl">
+            <div class="preview"><img id="prevImg" src="" alt="receipt"></div>
+            <button class="dlbtn" onclick="dlReceipt()">⬇ Download Receipt</button>
+            <button class="newbtn" onclick="resetUI()">+ Generate New Receipt</button>
+        </div>
+    </div>
+
+    <script>
+        const $ = id => document.getElementById(id);
+
+        /* Generate a realistic 12-digit UPI transaction ID */
+        function genTxnId() {
+            const digits = '0123456789';
+            let id = '';
+            for (let i = 0; i < 12; i++) id += digits[Math.floor(Math.random() * 10)];
+            return id;
+        }
+
+        /* Auto-fill current date, time, status-bar time, and UPI transaction ID on page load */
+        function fillNow() {
+            const now = new Date();
+            const pad = n => String(n).padStart(2, '0');
+            const dateVal = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+            const timeVal = pad(now.getHours()) + ':' + pad(now.getMinutes());
+            $('txDate').value = dateVal;
+            $('txTime').value = timeVal;
+            $('sbTime').value = timeVal;
+            $('txnId').value = genTxnId();
+        }
+        window.addEventListener('DOMContentLoaded', fillNow);
+        /* image upload preview */
+        const imgCache = { profPrev: null, bankPrev: null };
+
+        function previewImg(input, prevId, boxId) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => {
+                    imgCache[prevId] = img;
+                    const prev = $(prevId);
+                    prev.src = e.target.result;
+                    prev.style.display = 'block';
+                    $(boxId).querySelector('span').style.display = 'none';
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        /* helpers */
+        const fmtINR = v => parseFloat(v).toLocaleString('en-IN');
+
+        function getDate() {
+            const d = $('txDate').value, t = $('txTime').value;
+            if (d && t) {
+                const [yr, mo, dy] = d.split('-').map(Number);
+                const [hr, mn] = t.split(':').map(Number);
+                return new Date(yr, mo - 1, dy, hr, mn, 0);
+            }
+            return new Date();
+        }
+
+        /* "20 Apr 2026, 10:01pm" */
+        function fmtGP(dt) {
+            const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            let h = dt.getHours(), m = dt.getMinutes();
+            const ap = h >= 12 ? 'pm' : 'am';
+            const hr = h % 12 || 12;
+            return `${dt.getDate()} ${mo[dt.getMonth()]} ${dt.getFullYear()}, ${hr}:${String(m).padStart(2, '0')}${ap}`;
+        }
+
+        /* rounded rect */
+        function rr(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r);
+            ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+            ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r);
+            ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r); ctx.closePath();
+        }
+
+        /* word wrap */
+        function wrapLines(ctx, text, maxW) {
+            const words = text.split(' '); let line = '', lines = [];
+            for (const w of words) {
+                const t = line ? line + ' ' + w : w;
+                if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; }
+                else line = t;
+            }
+            if (line) lines.push(line);
+            return lines;
+        }
+
+        /* draw circle clip for profile pic */
+        function drawCircleImage(ctx, img, cx, cy, r) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.drawImage(img, cx - r, cy - r, r * 2, r * 2);
+            ctx.restore();
+        }
+
+        /* ══════════════════════════════════════════
+           MAIN DRAW FUNCTION
+        ══════════════════════════════════════════ */
+        function drawReceipt(d, dt) {
+            const SC = 2.5;  /* retina scale */
+            const W = 390;  /* logical px, matches phone width */
+
+            /* ── measure card rows ── */
+            const tmp = document.createElement('canvas').getContext('2d');
+            tmp.font = '400 13px Roboto,sans-serif';
+            const LINE_H = 16, ROW_LABEL_H = 18, ROW_PAD = 16;
+
+            const rows = [
+                { lbl: 'UPI transaction ID', val: d.txnId },
+                { lbl: 'To: ' + d.rName.split(' ')[0] + ' .', val: d.rApp + ' • ' + d.rUpi },
+                { lbl: 'From: ' + d.sName + ' (' + d.sBank + ')', val: d.sApp + ' • ' + d.sUpi },
+            ];
+
+            tmp.font = '600 13.5px Roboto,sans-serif';
+            let rowsH = 0;
+            rows.forEach(r => {
+                const lblLns = wrapLines(tmp, r.lbl, 310).length;
+                tmp.font = '400 12px Roboto,sans-serif';
+                const valLns = wrapLines(tmp, r.val, 310).length;
+                tmp.font = '600 13.5px Roboto,sans-serif';
+                rowsH += lblLns * LINE_H + valLns * LINE_H + ROW_PAD;
+            });
+
+            const CARD_HEADER_H = 70;  /* bank logo row */
+            const FOOTER_H = 36;
+            const cardH = CARD_HEADER_H + rowsH + FOOTER_H + 10;
+
+            /* layout geometry */
+            const STATUS_H = 40;
+            const HEADER_H = 390;  /* avatar + name + amount + pay again + completed + date */
+            const CARD_Y = STATUS_H + HEADER_H;
+            const BOTTOM_H = 56;   /* bottom action bar */
+            const TOTAL_H = CARD_Y + cardH + 20 + BOTTOM_H + 20;
+
+            const cv = document.createElement('canvas');
+            cv.width = W * SC;
+            cv.height = TOTAL_H * SC;
+            const ctx = cv.getContext('2d');
+            ctx.scale(SC, SC);
+
+            /* ── BACKGROUND ── */
+            ctx.fillStyle = '#0d0d0d';
+            ctx.fillRect(0, 0, W, TOTAL_H);
+
+            /* ═══════════════════════════
+               STATUS BAR — time only, left-aligned
+            ═══════════════════════════ */
+            const sbY = 20;
+            ctx.fillStyle = '#e8eaed';
+            ctx.font = '500 14px Roboto,sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(d.sbTime, 18, sbY);
+
+            /* ═══════════════════════════
+               BACK ARROW  (left)
+            ═══════════════════════════ */
+            const navY = STATUS_H + 30;
+            ctx.strokeStyle = '#e8eaed'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(30, navY); ctx.lineTo(20, navY + 8); ctx.lineTo(30, navY + 16);
+            ctx.stroke();
+
+            /* flag icon (right) */
+            ctx.fillStyle = '#9aa0a6';
+            ctx.font = '400 18px Roboto,sans-serif';
+            ctx.textAlign = 'right';
+            ctx.fillText('⚑', W - 44, navY + 14);
+
+            /* 3-dot menu */
+            const dotX = W - 16, dotY = navY + 7;
+            [0, 5, 10].forEach(dy => {
+                ctx.beginPath();
+                ctx.arc(dotX, dotY + dy, 2, 0, Math.PI * 2);
+                ctx.fillStyle = '#9aa0a6'; ctx.fill();
+            });
+
+            /* ═══════════════════════════
+               AVATAR CIRCLE (profile pic or initials)
+            ═══════════════════════════ */
+            const AVX = W / 2, AVY = STATUS_H + 90, AVR = 36;
+
+            if (imgCache.profPrev) {
+                /* draw image cropped to circle */
+                drawCircleImage(ctx, imgCache.profPrev, AVX, AVY, AVR);
+                /* thin border */
+                ctx.strokeStyle = '#333'; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.arc(AVX, AVY, AVR, 0, Math.PI * 2); ctx.stroke();
+            } else {
+                ctx.fillStyle = '#1a3a5c';
+                ctx.beginPath(); ctx.arc(AVX, AVY, AVR, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#5aaee0';
+                ctx.font = '700 28px Roboto,sans-serif';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText((d.rName[0] || 'I').toUpperCase(), AVX, AVY + 1);
+                ctx.textBaseline = 'alphabetic';
+            }
+
+            /* ═══════════════════════════
+               "To Imran Raza"
+            ═══════════════════════════ */
+            const nameY = AVY + AVR + 22;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '400 19px Roboto,sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('To ' + d.rName, W / 2, nameY);
+
+            /* phone number */
+            ctx.fillStyle = '#9aa0a6';
+            ctx.font = '400 13px Roboto,sans-serif';
+            ctx.fillText(d.rPhone, W / 2, nameY + 22);
+
+            /* ═══════════════════════════
+               AMOUNT
+            ═══════════════════════════ */
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '300 58px Roboto,sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('₹' + fmtINR(d.amt), W / 2, nameY + 88);
+
+            /* ═══════════════════════════
+               PAY AGAIN PILL
+            ═══════════════════════════ */
+            const pW = 128, pH = 38, pX = W / 2 - pW / 2, pY = nameY + 100;
+            ctx.fillStyle = '#1c3e6b';
+            rr(ctx, pX, pY, pW, pH, 19); ctx.fill();
+            ctx.fillStyle = '#82b4f5';
+            ctx.font = '400 15px Roboto,sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Pay again', W / 2, pY + 25);
+
+            /* ═══════════════════════════
+               COMPLETED ROW
+            ═══════════════════════════ */
+            const cY = pY + pH + 28;
+            const ckX = W / 2 - 55;
+            /* green filled circle */
+            ctx.fillStyle = '#34a853';
+            ctx.beginPath(); ctx.arc(ckX, cY, 10, 0, Math.PI * 2); ctx.fill();
+            /* white checkmark */
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(ckX - 4, cY + 0.5);
+            ctx.lineTo(ckX - 1, cY + 4);
+            ctx.lineTo(ckX + 5.5, cY - 3.5);
+            ctx.stroke();
+            /* "Completed" text */
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '400 15px Roboto,sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Completed', W / 2 - 41, cY + 6);
+
+            /* thin horizontal divider */
+            ctx.strokeStyle = '#2a2a2a'; ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(50, cY + 20); ctx.lineTo(W - 50, cY + 20);
+            ctx.stroke();
+
+            /* date — centered, lighter grey, matches screenshot */
+            ctx.fillStyle = '#9aa0a6';
+            ctx.font = '400 14px Roboto,sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(fmtGP(dt), W / 2, cY + 40);
+
+            /* ═══════════════════════════
+               CARD (dark rounded card)
+            ═══════════════════════════ */
+            const CX = 16, CW = W - 32;
+            ctx.fillStyle = '#1a1a1a';
+            rr(ctx, CX, CARD_Y, CW, cardH, 16); ctx.fill();
+
+            /* ── BANK HEADER ROW ── */
+            const BLX = CX + 14, BLY = CARD_Y + 14;
+            const LOGO_W = 56, LOGO_H = 36;  /* rectangular, matches screenshot */
+
+            if (imgCache.bankPrev) {
+                ctx.fillStyle = '#ffffff';
+                rr(ctx, BLX, BLY, LOGO_W, LOGO_H, 7); ctx.fill();
+                ctx.save();
+                rr(ctx, BLX, BLY, LOGO_W, LOGO_H, 7); ctx.clip();
+                ctx.drawImage(imgCache.bankPrev, BLX, BLY, LOGO_W, LOGO_H);
+                ctx.restore();
+            } else {
+                /* white rounded rect */
+                ctx.fillStyle = '#ffffff';
+                rr(ctx, BLX, BLY, LOGO_W, LOGO_H, 7); ctx.fill();
+                /* purple "slice" */
+                ctx.fillStyle = '#9c27b0';
+                ctx.font = '700 13px Roboto,sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('slice', BLX + LOGO_W / 2, BLY + 15);
+                /* tiny "small finance bank" below */
+                ctx.font = '400 5.5px Roboto,sans-serif';
+                ctx.fillStyle = '#9c27b0';
+                ctx.fillText('small finance bank', BLX + LOGO_W / 2, BLY + 24);
+            }
+
+            /* bank name — bold white */
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '600 14px Roboto,sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(d.sBank, BLX + LOGO_W + 12, BLY + 14);
+            /* account last 4 — grey */
+            ctx.fillStyle = '#9aa0a6';
+            ctx.font = '400 13px Roboto,sans-serif';
+            ctx.fillText(d.sAcct, BLX + LOGO_W + 12, BLY + 30);
+
+            /* chevron down (right side) */
+            const arX = CX + CW - 20, arY = BLY + LOGO_H / 2;
+            ctx.strokeStyle = '#666'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(arX - 6, arY - 3); ctx.lineTo(arX, arY + 3); ctx.lineTo(arX + 6, arY - 3);
+            ctx.stroke();
+
+            /* divider under bank header */
+            ctx.strokeStyle = '#2a2a2a'; ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(CX + 12, CARD_Y + CARD_HEADER_H);
+            ctx.lineTo(CX + CW - 12, CARD_Y + CARD_HEADER_H);
+            ctx.stroke();
+
+            /* ── TRANSACTION ROWS ── */
+            let ry = CARD_Y + CARD_HEADER_H + 14;
+
+            rows.forEach(r => {
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '600 13.5px Roboto,sans-serif';
+                ctx.textAlign = 'left';
+                const lblLines = wrapLines(ctx, r.lbl, CW - 32);
+                lblLines.forEach((ln, i) => ctx.fillText(ln, CX + 16, ry + i * LINE_H));
+
+                ctx.fillStyle = '#7a8085';
+                ctx.font = '400 12px Roboto,sans-serif';
+                const valLines = wrapLines(ctx, r.val, CW - 32);
+                valLines.forEach((ln, i) => ctx.fillText(ln, CX + 16, ry + lblLines.length * LINE_H + i * LINE_H));
+                ry += lblLines.length * LINE_H + valLines.length * LINE_H + ROW_PAD;
+            });
+
+            /* ── FOOTER: POWERED BY UPI ── */
+            const fY = CARD_Y + cardH - FOOTER_H + 6;
+            ctx.strokeStyle = '#242424'; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(CX + 12, fY); ctx.lineTo(CX + CW - 12, fY); ctx.stroke();
+
+            ctx.fillStyle = '#777';
+            ctx.font = '400 9px Roboto,sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('POWERED BY', W / 2 - 22, fY + 14);
+            ctx.fillStyle = '#f97316';
+            ctx.font = '700 13px Roboto,sans-serif';
+            ctx.fillText('UPI▸▸', W / 2 + 22, fY + 14);
+
+            /* ═══════════════════════════
+               BOTTOM ACTION BAR
+            ═══════════════════════════ */
+            const barY = TOTAL_H - BOTTOM_H - 10;
+            ctx.fillStyle = '#1a1a1a';
+            rr(ctx, 12, barY, W - 24, 46, 23); ctx.fill();
+
+            const actions = ['? Having issues?', '⇄ Share', '👥 Split expens…'];
+            const bW = (W - 24 - 32) / 3;
+            actions.forEach((a, i) => {
+                const bx = 12 + 14 + i * (bW + 2);
+                ctx.fillStyle = '#2a2a2a';
+                rr(ctx, bx, barY + 7, bW, 32, 16); ctx.fill();
+                ctx.fillStyle = '#d0d3d8';
+                ctx.font = '400 10.5px Roboto,sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(a, bx + bW / 2, barY + 28);
+            });
+
+            /* ═══════════════════════════
+               BOTTOM NAV BAR (≡ ○ <)
+            ═══════════════════════════ */
+            const navBY = TOTAL_H - 14;
+            ['≡', '○', '‹'].forEach((icon, i) => {
+                ctx.fillStyle = '#888';
+                ctx.font = '400 16px Roboto,sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(icon, W / 4 + i * W / 4, navBY);
+            });
+
+            return cv;
+        }
+
+        /* ── UI Wiring ── */
+        let lastUrl = '', lastFile = '';
+
+        function getInputs() {
+            return {
+                rName: $('rName').value.trim() || 'Unknown',
+                rPhone: $('rPhone').value.trim(),
+                rUpi: $('rUpi').value.trim(),
+                rApp: $('rApp').value.trim(),
+                amt: parseFloat($('amt').value) || 0,
+                txnId: $('txnId').value.trim(),
+                sName: $('sName').value.trim(),
+                sBank: $('sBank').value.trim(),
+                sAcct: $('sAcct').value.trim(),
+                sUpi: $('sUpi').value.trim(),
+                sApp: $('sApp').value.trim(),
+                sbTime: $('sbTime').value.trim(),
+            };
+        }
+
+        function onBankSelect() {
+            const sel = document.getElementById('sBankSelect');
+            const inp = document.getElementById('sBank');
+            if (sel.value === 'custom') {
+                inp.style.display = 'block';
+                inp.value = '';
+                inp.focus();
+            } else {
+                inp.style.display = 'none';
+                inp.value = sel.value;
+            }
+        }
+
+        function generate() {
+            /* Refresh date/time fields and generate a fresh UPI transaction ID */
+            fillNow();
+            $('txnId').value = genTxnId();
+            const d = getInputs(), dt = getDate();
+            const cv = drawReceipt(d, dt);
+            lastUrl = cv.toDataURL('image/png');
+            lastFile = 'gpay_receipt_' + Date.now() + '.png';
+            $('prevImg').src = lastUrl;
+            $('formEl').style.display = 'none';
+            $('resultEl').classList.add('show');
+            window.scrollTo(0, 0);
+        }
+
+        function dlReceipt() {
+            if (!lastUrl) return;
+            const a = document.createElement('a');
+            a.href = lastUrl; a.download = lastFile;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
+        function resetUI() {
+            $('formEl').style.display = 'block';
+            $('resultEl').classList.remove('show');
+            $('prevImg').src = ''; lastUrl = '';
+            fillNow();
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+
+</html>
