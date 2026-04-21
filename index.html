@@ -4,9 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Pay Receipt Generator</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>GPay Receipt Generator</title>
     <style>
         * {
             margin: 0;
@@ -15,47 +13,53 @@
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
-            background: #222;
+            font-family: "Roboto", sans-serif;
+            background: #f0f2f5;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px 12px 40px;
         }
 
-        h2 {
-            color: #ccc;
-            font-size: 13px;
-            font-weight: 400;
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        /* ── FORM VIEW ── */
+        .form-view {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 16px 14px 24px;
+        }
+
+        .page-title {
+            font-size: 17px;
+            font-weight: 500;
+            color: #1a1a1a;
             margin-bottom: 14px;
-            letter-spacing: .3px;
-        }
-
-        .wrap {
-            width: 100%;
-            max-width: 430px;
+            text-align: center;
         }
 
         .sec {
-            background: #1c1c1e;
-            border: 1px solid #2a2a2a;
-            border-radius: 14px;
-            padding: 14px;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 13px 15px;
             margin-bottom: 10px;
         }
 
         .sec-lbl {
             font-size: 10px;
             font-weight: 600;
-            color: #555;
+            color: #888;
             text-transform: uppercase;
-            letter-spacing: .7px;
-            margin-bottom: 10px;
+            letter-spacing: .8px;
+            margin-bottom: 11px;
         }
 
         .fg {
-            margin-bottom: 8px;
+            margin-bottom: 9px;
         }
 
         .fg:last-child {
@@ -64,108 +68,69 @@
 
         .fg label {
             display: block;
-            font-size: 11px;
-            color: #666;
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 3px;
             font-weight: 500;
-            margin-bottom: 4px;
         }
 
-        .fg input {
+        .fg input,
+        .fg select {
             width: 100%;
-            background: #111;
-            border: 1px solid #2c2c2c;
-            border-radius: 9px;
-            padding: 8px 11px;
-            color: #f0f0f0;
+            background: #fafafa;
+            border: 1px solid #d0d0d0;
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #1a1a1a;
             font-size: 13px;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
             outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            transition: border-color .15s, box-shadow .15s;
         }
 
-        .fg input:focus {
-            border-color: #444;
+        .fg input:focus,
+        .fg select:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, .12);
+            background: #fff;
         }
 
-        .genbtn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #fff;
-            cursor: pointer;
-            background: #1a73e8;
-            margin-bottom: 16px;
-            font-family: 'Roboto', sans-serif;
+        .fg input[readonly] {
+            color: #aaa;
+            background: #f5f5f5;
+            cursor: default;
         }
 
-        .result {
-            display: none;
+        .row2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
         }
 
-        .result.show {
-            display: block;
-        }
-
-        .preview {
-            border-radius: 14px;
-            overflow: hidden;
-            margin-bottom: 11px;
-            line-height: 0;
-        }
-
-        .preview img {
-            width: 100%;
-            display: block;
-        }
-
-        .dlbtn {
-            width: 100%;
-            padding: 13px;
-            border: none;
-            border-radius: 11px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #fff;
-            cursor: pointer;
-            background: #1a73e8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            margin-bottom: 9px;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .newbtn {
-            width: 100%;
-            padding: 12px;
-            background: #1c1c1e;
-            border: 1px solid #3a3a3a;
-            border-radius: 11px;
-            color: #e0e0e0;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        /* upload area */
         .upload-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
 
+        .upload-lbl {
+            font-size: 12px;
+            color: #555;
+            font-weight: 500;
+            margin-bottom: 4px;
+            display: block;
+        }
+
         .upload-box {
-            flex: 1;
-            background: #111;
-            border: 1px dashed #333;
-            border-radius: 9px;
-            padding: 8px;
+            border: 1.5px dashed #ccc;
+            border-radius: 8px;
+            padding: 13px 8px;
             text-align: center;
             cursor: pointer;
             position: relative;
+            background: #fafafa;
         }
 
         .upload-box input[type=file] {
@@ -177,575 +142,702 @@
             height: 100%;
         }
 
-        .upload-box span {
-            font-size: 11px;
-            color: #666;
+        .upload-box .hint {
+            font-size: 10px;
+            color: #aaa;
             display: block;
-            margin-top: 4px;
+            margin-top: 3px;
+        }
+
+        .upload-box .ico {
+            font-size: 18px;
+            display: block;
         }
 
         .upload-box img {
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             object-fit: contain;
-            border-radius: 6px;
+            border-radius: 4px;
+            display: none;
+            margin: 0 auto 3px;
         }
 
-        .upload-lbl {
-            font-size: 11px;
-            color: #666;
+        .genbtn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
             font-weight: 500;
-            margin-bottom: 6px;
+            color: #fff;
+            cursor: pointer;
+            background: #1a73e8;
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+            margin-top: 4px;
+        }
+
+        .genbtn:active {
+            opacity: .88;
+        }
+
+        /* ── RECEIPT VIEW (full screen, no frame) ── */
+        .receipt-view {
+            background: #0d0d0d;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+        }
+
+        .sbar {
+            padding: 12px 20px 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sbar-time {
+            color: #C6C6C6;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .sbar-r {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #C6C6C6;
+            font-size: 11px;
+        }
+
+        .nbar {
+            padding: 4px 20px 10px;
+            display: flex;
+            margin-top: 9px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nbar-back {
+            color: #C6C6C6;
+            font-size: 20px;
+        }
+
+        .ndots {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .ndots span {
+            width: 3px;
+            height: 3px;
+            background: #C6C6C6;
+            border-radius: 50%;
             display: block;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 10px 0 0;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            overflow: hidden;
+            background: #1a3a5c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #5aaee0;
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .toname {
+            color: #C6C6C6;
+            font-size: 19px;
+            font-weight: 400;
+            margin-bottom: 3px;
+        }
+
+        .tophone {
+            color: #C6C6C6;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .amount {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #C6C6C6;
+            font-size: 65px;
+            font-weight: 300;
+            margin-bottom: 18px;
+            letter-spacing: -1px;
+        }
+
+        .payagain {
+            display: inline-block;
+            background: #A8C8FB;
+            color: #1E3A5F;
+            border-radius: 22px;
+            padding: 15px 26px;
+            font-size: 14px;
+            margin-bottom: 35px;
+            cursor: pointer;
+        }
+
+        .comp-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .chk {
+            width: 15px;
+            height: 15px;
+            background: #34a853;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .chk svg {
+            width: 11px;
+            height: 11px;
+        }
+
+        .comp-txt {
+            color: #C6C6C6;
+            font-size: 15px;
+
+        }
+
+        .divdr {
+            border: none;
+            width: 250px;
+            border-top: 2px solid #434343;
+            margin: 0 auto 8px;
+        }
+
+        .txdate {
+            color: #C6C6C6;
+            font-size: 15px;
+            text-align: center;
+            margin-top: 22px;
+            margin-bottom: 28px;
+        }
+
+        .card {
+            background: #1a1a1a;
+            border-radius: 16px;
+            margin: 0 14px 12px;
+            overflow: hidden;
+            border: 1px solid #434343;
+        }
+
+        .bank-row {
+            display: flex;
+            align-items: center;
+            padding: 13px 16px;
+            gap: 11px;
+            border-bottom: 1px solid #434343;
+        }
+
+        .blogo {
+            /* width: 54px;
+            height: 34px; */
+            width: 37px;
+            height: 22px;
+            background: #fff;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .blogo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .blogo-txt {
+            color: #9c27b0;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .blogo-sub {
+            color: #9c27b0;
+            font-size: 6px;
+            display: block;
+        }
+
+        .binfo {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .bname {
+            color: #C6C6C6;
+            font-size: 18px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .bacct {
+            color: #C6C6C6;
+            font-size: 17px;
+        }
+
+        .bchev {
+            color: #C6C6C6;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .tx-rows {
+            padding: 13px 16px 9px;
+            line-height: 22px;
+        }
+
+        .tx-row {
+            margin-bottom: 12px;
+        }
+
+        .tx-row:last-child {
+            margin-bottom: 4px;
+        }
+
+        .tx-lbl {
+            color: #C6C6C6;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .tx-val {
+            color: #C6C6C6;
+            font-size: 14px;
+            word-break: break-all;
+        }
+
+        .card-foot {
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .upi {
+            width: 60px;
+        }
+
+        .pwrd {
+            color: #666;
+            font-size: 8px;
+            letter-spacing: .5px;
+        }
+
+        .upi {
+            color: #f97316;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .quick-bar {
+            display: flex;
+            gap: 6px;
+            padding: 0 14px 16px;
+        }
+
+        .qbtn {
+            flex: 1;
+            background: #1e1e1e;
+            border-radius: 14px;
+            padding: 9px 4px;
+            text-align: center;
+            color: #c8cace;
+            font-size: 10px;
+        }
+
+        /* bottom action bar */
+        .bottom-actions {
+            background: #111;
+            border-top: 1px solid #222;
+            padding: 14px 16px;
+            padding-bottom: calc(14px + env(safe-area-inset-bottom));
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-edit {
+            flex: 1;
+            padding: 13px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #c8cace;
+            cursor: pointer;
+            background: transparent;
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+        }
+
+        .btn-edit:active {
+            opacity: .7;
+        }
+
+        .btn-dl {
+            flex: 2;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+            cursor: pointer;
+            background: #1a73e8;
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+        }
+
+        .btn-dl:active {
+            opacity: .88;
+        }
+
+        .leftarrow {
+            width: 14px;
         }
     </style>
 </head>
 
 <body>
-    <div class="wrap">
-        <h2>Google Pay Receipt Generator</h2>
 
-        <div id="formEl">
-            <!-- Profile Photo -->
+    <!-- FORM VIEW -->
+    <div id="v-form" class="view active">
+        <div class="form-view">
+            <p class="page-title">GPay Receipt Generator</p>
+
             <div class="sec">
-                <div class="sec-lbl">Profile Photo &amp; Bank Logo</div>
+                <div class="sec-lbl">Photos</div>
                 <div class="upload-row">
                     <div>
-                        <span class="upload-lbl">Profile Picture</span>
-                        <div class="upload-box" id="profBox">
-                            <input type="file" accept="image/*" onchange="previewImg(this,'profPrev','profBox')">
-                            <img id="profPrev" src="" style="display:none">
-                            <span id="profHint">Tap to upload</span>
+                        <span class="upload-lbl">Profile pic</span>
+                        <div class="upload-box">
+                            <input type="file" accept="image/*"
+                                onchange="handleUpload(this,'profImg','profHint','profIco','prof')">
+                            <img id="profImg">
+                            <span class="ico" id="profIco">&#128247;</span>
+                            <span class="hint" id="profHint">Tap to upload</span>
                         </div>
                     </div>
                     <div>
-                        <span class="upload-lbl">Bank Logo</span>
-                        <div class="upload-box" id="bankBox">
-                            <input type="file" accept="image/*" onchange="previewImg(this,'bankPrev','bankBox')">
-                            <img id="bankPrev" src="" style="display:none">
-                            <span id="bankHint">Tap to upload</span>
+                        <span class="upload-lbl">Bank logo</span>
+                        <div class="upload-box">
+                            <input type="file" accept="image/*"
+                                onchange="handleUpload(this,'bankImg','bankHint','bankIco','bank')">
+                            <img id="bankImg">
+                            <span class="ico" id="bankIco">&#127970;</span>
+                            <span class="hint" id="bankHint">Tap to upload</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recipient -->
             <div class="sec">
                 <div class="sec-lbl">Recipient</div>
-                <div class="fg"><label>Full Name (e.g. Imran Raza)</label><input id="rName" value="Imran Raza"></div>
-                <div class="fg"><label>Phone / UPI handle shown</label><input id="rPhone" value="+91 ••••• •2565"></div>
+                <div class="fg"><label>Name</label><input id="rName" value="Imran Raza"></div>
+                <div class="fg"><label>Phone shown</label><input id="rPhone" value="+91 ••••• •2565"></div>
                 <div class="fg"><label>UPI ID</label><input id="rUpi" value="imranrazair785-1@okhdfcbank"></div>
-                <div class="fg"><label>UPI App (e.g. Google Pay)</label><input id="rApp" value="Google Pay"></div>
+                <div class="fg"><label>UPI App</label><input id="rApp" value="Google Pay"></div>
             </div>
 
-            <!-- Transaction -->
             <div class="sec">
                 <div class="sec-lbl">Transaction</div>
-                <div class="fg"><label>Amount (₹)</label><input id="amt" type="number" value="30" inputmode="decimal">
+                <div class="fg"><label>Amount (&#8377;)</label><input id="amt" type="number" value="30"></div>
+                <div class="row2">
+                    <div class="fg"><label>Date</label><input id="txDate" type="date"></div>
+                    <div class="fg"><label>Time</label><input id="txTime" type="time"></div>
                 </div>
-                <div class="fg"><label>Date</label><input id="txDate" type="date"></div>
-                <div class="fg"><label>Time</label><input id="txTime" type="time"></div>
-                <div class="fg"><label>UPI Transaction ID <span
-                            style="color:#4a90d9;font-size:10px;font-weight:400;">(auto-generated)</span></label><input
-                        id="txnId" readonly style="color:#9aa0a6;cursor:default;"></div>
+                <div class="fg">
+                    <label>UPI Txn ID <span style="color:#1a73e8;font-size:10px;">(auto-generated)</span></label>
+                    <input id="txnId" readonly>
+                </div>
             </div>
 
-            <!-- Sender -->
             <div class="sec">
                 <div class="sec-lbl">Sender</div>
-                <div class="fg"><label>Full Name</label><input id="sName" value="DIVAKAR SINGH CHAUHAN"></div>
+                <div class="fg"><label>Name</label><input id="sName" value="DIVAKAR SINGH CHAUHAN"></div>
                 <div class="fg">
-                    <label>Bank Name</label>
-                    <select id="sBankSelect" onchange="onBankSelect()"
-                        style="width:100%;background:#111;border:1px solid #2c2c2c;border-radius:9px;padding:8px 11px;color:#f0f0f0;font-size:13px;font-family:'Roboto',sans-serif;outline:none;margin-bottom:6px;appearance:none;-webkit-appearance:none;cursor:pointer;">
-                        <option value="Slice Small Finance Bank">Slice Small Finance Bank</option>
-                        <option value="State Bank of India">State Bank of India</option>
-                        <option value="HDFC Bank">HDFC Bank</option>
-                        <option value="ICICI Bank">ICICI Bank</option>
-                        <option value="Axis Bank">Axis Bank</option>
-                        <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
-                        <option value="Punjab National Bank">Punjab National Bank</option>
-                        <option value="Bank of Baroda">Bank of Baroda</option>
-                        <option value="Canara Bank">Canara Bank</option>
-                        <option value="Union Bank of India">Union Bank of India</option>
-                        <option value="IndusInd Bank">IndusInd Bank</option>
-                        <option value="Yes Bank">Yes Bank</option>
-                        <option value="IDFC First Bank">IDFC First Bank</option>
-                        <option value="Federal Bank">Federal Bank</option>
-                        <option value="Paytm Payments Bank">Paytm Payments Bank</option>
-                        <option value="Airtel Payments Bank">Airtel Payments Bank</option>
-                        <option value="custom">✏️ Custom — type below</option>
+                    <label>Bank</label>
+                    <select id="sBankSel" onchange="onBankSel()">
+                        <option>Slice Small Finance Bank</option>
+                        <option>State Bank of India</option>
+                        <option>HDFC Bank</option>
+                        <option>ICICI Bank</option>
+                        <option>Axis Bank</option>
+                        <option>Kotak Mahindra Bank</option>
+                        <option>Punjab National Bank</option>
+                        <option>Bank of Baroda</option>
+                        <option>Canara Bank</option>
+                        <option>Union Bank of India</option>
+                        <option>IndusInd Bank</option>
+                        <option>Yes Bank</option>
+                        <option>IDFC First Bank</option>
+                        <option>Federal Bank</option>
+                        <option>Paytm Payments Bank</option>
+                        <option>Airtel Payments Bank</option>
+                        <option value="custom">Custom — type below</option>
                     </select>
-                    <input id="sBank" value="Slice Small Finance Bank" placeholder="Bank name" style="display:none;">
+                    <input id="sBank" value="Slice Small Finance Bank" placeholder="Type bank name"
+                        style="display:none;margin-top:8px;">
                 </div>
-                <div class="fg"><label>Account Last 4 Digits</label><input id="sAcct" maxlength="4" value="2147"
-                        inputmode="numeric"></div>
+                <div class="row2">
+                    <div class="fg"><label>Account last 4</label><input id="sAcct" value="2147" maxlength="4"></div>
+                    <div class="fg"><label>UPI App</label><input id="sApp" value="Google Pay"></div>
+                </div>
                 <div class="fg"><label>Sender UPI ID</label><input id="sUpi" value="divakarrajput2004-1@okicici"></div>
-                <div class="fg"><label>Sender UPI App</label><input id="sApp" value="Google Pay"></div>
             </div>
 
-            <!-- Status Bar -->
             <div class="sec">
-                <div class="sec-lbl">Status Bar Time</div>
-                <div class="fg"><label>Time</label><input id="sbTime"></div>
+                <div class="sec-lbl">Status bar</div>
+                <div class="fg"><label>Time shown</label><input id="sbTime"></div>
             </div>
 
-            <button class="genbtn" onclick="generate()">Generate Google Pay Receipt</button>
-        </div>
-
-        <div class="result" id="resultEl">
-            <div class="preview"><img id="prevImg" src="" alt="receipt"></div>
-            <button class="dlbtn" onclick="dlReceipt()">⬇ Download Receipt</button>
-            <button class="newbtn" onclick="resetUI()">+ Generate New Receipt</button>
+            <button class="genbtn" onclick="generate()">Generate Receipt</button>
         </div>
     </div>
 
+    <!-- RECEIPT VIEW (full-screen, no frame) -->
+    <div id="v-receipt" class="view">
+        <div class="receipt-view">
+
+            <!-- captured area -->
+            <div id="receiptCapture">
+                <!-- <div class="sbar">
+                    <span class="sbar-time" id="d-sbTime">10:02</span>
+                    <div class="sbar-r">
+                        <span>&#9679;&#9679;&#9679;</span>
+                        <span>&#9646;&#9646;</span>
+                        <span>&#9632;</span>
+                    </div>
+                </div> -->
+                <div class="nbar">
+                    <span class="nbar-back"><img src="leftarrow.png" alt="" class="leftarrow"></span>
+                    <div style="display:flex;align-items:center;gap:14px;">
+                        <img src="flag.png" alt="" class="leftarrow">
+                        <div class="ndots"><span></span><span></span><span></span></div>
+                    </div>
+                </div>
+                <div class="hero">
+                    <div class="avatar" id="d-avatar">I</div>
+                    <div class="toname" id="d-toName">To Imran Raza</div>
+                    <div class="tophone" id="d-toPhone">+91 ••••• •2565</div>
+                    <div class="amount">
+                        <div class="amount" style="font-size: 40px;font-weight: normal;">&#8377</div>
+                        <div class="amount" id="d-amt">30</div>
+                    </div>
+                    <!-- <div class="amount" id="d-amt">&#8377;30</div> -->
+                    <div class="payagain">Pay again</div>
+                    <div class="comp-row">
+                        <div class="chk">
+                            <svg viewBox="0 0 12 12" fill="none">
+                                <polyline points="2,6 5,9 10,3" stroke="#0d0d0d" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <span class="comp-txt">Completed</span>
+                    </div>
+                    <hr class="divdr">
+                    <div class="txdate" id="d-date">20 Apr 2026, 10:01pm</div>
+                </div>
+
+                <div class="card">
+                    <div class="bank-row">
+                        <div class="blogo" id="d-bankLogo">
+                            <div class="blogo-txt">slice<span class="blogo-sub">small finance bank</span></div>
+                        </div>
+                        <div class="binfo">
+                            <div class="bname" id="d-bankName">Slice Small Finance Bank</div>
+                            <div class="bacct" id="d-bankAcct">2147</div>
+                        </div>
+                        <span class="bchev"><img src="drop.png" alt="" class="leftarrow"></span>
+                    </div>
+                    <div class="tx-rows">
+                        <div class="tx-row">
+                            <div class="tx-lbl">UPI transaction ID</div>
+                            <div class="tx-val" id="d-txnId">647616156699</div>
+                        </div>
+                        <div class="tx-row">
+                            <div class="tx-lbl" id="d-toLbl">To: Imran .</div>
+                            <div class="tx-val" id="d-toVal">Google Pay &bull; imranrazair785-1@okhdfcbank</div>
+                        </div>
+                        <div class="tx-row">
+                            <div class="tx-lbl" id="d-fromLbl">From: DIVAKAR SINGH CHAUHAN (Slice Small Finance Bank)
+                            </div>
+                            <div class="tx-val" id="d-fromVal">Google Pay &bull; divakarrajput2004-1@okicici</div>
+                        </div>
+                        <div class="tx-row">
+                            <div class="tx-lbl">Google transaction ID</div>
+                            <div class="tx-val" id="#">CICAgNjy-uLnGA</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-foot">
+                    <img src="upi.png" alt="" class="upi">
+                </div>
+
+                <div class="quick-bar">
+                    <div class="qbtn">? Having issues?</div>
+                    <div class="qbtn">&#8646; Share</div>
+                    <div class="qbtn">Split expens...</div>
+                </div>
+            </div>
+            <!-- end capture area -->
+
+            <!-- bottom actions — NOT captured -->
+            <div class="bottom-actions">
+                <button class="btn-edit" onclick="goBack()">&#8592; Edit</button>
+                <button class="btn-dl" onclick="downloadReceipt()">&#8595; Download PNG</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         const $ = id => document.getElementById(id);
+        const pad = n => String(n).padStart(2, '0');
+        let profileSrc = null, bankSrc = null;
 
-        /* Generate a realistic 12-digit UPI transaction ID */
-        function genTxnId() {
-            const digits = '0123456789';
-            let id = '';
-            for (let i = 0; i < 12; i++) id += digits[Math.floor(Math.random() * 10)];
-            return id;
-        }
-
-        /* Auto-fill current date, time, status-bar time, and UPI transaction ID on page load */
-        function fillNow() {
+        function init() {
             const now = new Date();
-            const pad = n => String(n).padStart(2, '0');
-            const dateVal = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
-            const timeVal = pad(now.getHours()) + ':' + pad(now.getMinutes());
-            $('txDate').value = dateVal;
-            $('txTime').value = timeVal;
-            $('sbTime').value = timeVal;
-            $('txnId').value = genTxnId();
+            $('txDate').value = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+            $('txTime').value = pad(now.getHours()) + ':' + pad(now.getMinutes());
+            $('sbTime').value = pad(now.getHours()) + ':' + pad(now.getMinutes());
+            $('txnId').value = genId();
         }
-        window.addEventListener('DOMContentLoaded', fillNow);
-        /* image upload preview */
-        const imgCache = { profPrev: null, bankPrev: null };
 
-        function previewImg(input, prevId, boxId) {
-            const file = input.files[0];
-            if (!file) return;
+        function genId() { let s = ''; for (let i = 0; i < 12; i++)s += Math.floor(Math.random() * 10); return s; }
+
+        function fmtDate(d, t) {
+            if (!d || !t) return '';
+            const [yr, mo, dy] = d.split('-').map(Number);
+            const [hr, mn] = t.split(':').map(Number);
+            const dt = new Date(yr, mo - 1, dy, hr, mn);
+            const mos = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const h12 = dt.getHours() % 12 || 12;
+            const ap = dt.getHours() >= 12 ? 'pm' : 'am';
+            return `${dt.getDate()} ${mos[dt.getMonth()]} ${dt.getFullYear()}, ${h12}:${pad(dt.getMinutes())}${ap}`;
+        }
+
+        function handleUpload(input, imgId, hintId, icoId, type) {
+            const file = input.files[0]; if (!file) return;
             const reader = new FileReader();
             reader.onload = e => {
-                const img = new Image();
-                img.onload = () => {
-                    imgCache[prevId] = img;
-                    const prev = $(prevId);
-                    prev.src = e.target.result;
-                    prev.style.display = 'block';
-                    $(boxId).querySelector('span').style.display = 'none';
-                };
-                img.src = e.target.result;
+                $(imgId).src = e.target.result; $(imgId).style.display = 'block';
+                $(hintId).style.display = 'none'; $(icoId).style.display = 'none';
+                if (type === 'prof') profileSrc = e.target.result;
+                else bankSrc = e.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        /* helpers */
-        const fmtINR = v => parseFloat(v).toLocaleString('en-IN');
-
-        function getDate() {
-            const d = $('txDate').value, t = $('txTime').value;
-            if (d && t) {
-                const [yr, mo, dy] = d.split('-').map(Number);
-                const [hr, mn] = t.split(':').map(Number);
-                return new Date(yr, mo - 1, dy, hr, mn, 0);
-            }
-            return new Date();
+        function onBankSel() {
+            const sel = $('sBankSel'), inp = $('sBank');
+            if (sel.value === 'custom') { inp.style.display = 'block'; inp.value = ''; inp.focus(); }
+            else { inp.style.display = 'none'; inp.value = sel.value; }
         }
 
-        /* "20 Apr 2026, 10:01pm" */
-        function fmtGP(dt) {
-            const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            let h = dt.getHours(), m = dt.getMinutes();
-            const ap = h >= 12 ? 'pm' : 'am';
-            const hr = h % 12 || 12;
-            return `${dt.getDate()} ${mo[dt.getMonth()]} ${dt.getFullYear()}, ${hr}:${String(m).padStart(2, '0')}${ap}`;
-        }
-
-        /* rounded rect */
-        function rr(ctx, x, y, w, h, r) {
-            ctx.beginPath();
-            ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.arcTo(x + w, y, x + w, y + r, r);
-            ctx.lineTo(x + w, y + h - r); ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
-            ctx.lineTo(x + r, y + h); ctx.arcTo(x, y + h, x, y + h - r, r);
-            ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r); ctx.closePath();
-        }
-
-        /* word wrap */
-        function wrapLines(ctx, text, maxW) {
-            const words = text.split(' '); let line = '', lines = [];
-            for (const w of words) {
-                const t = line ? line + ' ' + w : w;
-                if (ctx.measureText(t).width > maxW && line) { lines.push(line); line = w; }
-                else line = t;
-            }
-            if (line) lines.push(line);
-            return lines;
-        }
-
-        /* draw circle clip for profile pic */
-        function drawCircleImage(ctx, img, cx, cy, r) {
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(cx, cy, r, 0, Math.PI * 2);
-            ctx.clip();
-            ctx.drawImage(img, cx - r, cy - r, r * 2, r * 2);
-            ctx.restore();
-        }
-
-        /* ══════════════════════════════════════════
-           MAIN DRAW FUNCTION
-        ══════════════════════════════════════════ */
-        function drawReceipt(d, dt) {
-            const SC = 2.5;  /* retina scale */
-            const W = 390;  /* logical px, matches phone width */
-
-            /* ── measure card rows ── */
-            const tmp = document.createElement('canvas').getContext('2d');
-            tmp.font = '400 13px Roboto,sans-serif';
-            const LINE_H = 16, ROW_LABEL_H = 18, ROW_PAD = 16;
-
-            const rows = [
-                { lbl: 'UPI transaction ID', val: d.txnId },
-                { lbl: 'To: ' + d.rName.split(' ')[0] + ' .', val: d.rApp + ' • ' + d.rUpi },
-                { lbl: 'From: ' + d.sName + ' (' + d.sBank + ')', val: d.sApp + ' • ' + d.sUpi },
-            ];
-
-            tmp.font = '600 13.5px Roboto,sans-serif';
-            let rowsH = 0;
-            rows.forEach(r => {
-                const lblLns = wrapLines(tmp, r.lbl, 310).length;
-                tmp.font = '400 12px Roboto,sans-serif';
-                const valLns = wrapLines(tmp, r.val, 310).length;
-                tmp.font = '600 13.5px Roboto,sans-serif';
-                rowsH += lblLns * LINE_H + valLns * LINE_H + ROW_PAD;
-            });
-
-            const CARD_HEADER_H = 70;  /* bank logo row */
-            const FOOTER_H = 36;
-            const cardH = CARD_HEADER_H + rowsH + FOOTER_H + 10;
-
-            /* layout geometry */
-            const STATUS_H = 40;
-            const HEADER_H = 390;  /* avatar + name + amount + pay again + completed + date */
-            const CARD_Y = STATUS_H + HEADER_H;
-            const BOTTOM_H = 56;   /* bottom action bar */
-            const TOTAL_H = CARD_Y + cardH + 20 + BOTTOM_H + 20;
-
-            const cv = document.createElement('canvas');
-            cv.width = W * SC;
-            cv.height = TOTAL_H * SC;
-            const ctx = cv.getContext('2d');
-            ctx.scale(SC, SC);
-
-            /* ── BACKGROUND ── */
-            ctx.fillStyle = '#0d0d0d';
-            ctx.fillRect(0, 0, W, TOTAL_H);
-
-            /* ═══════════════════════════
-               STATUS BAR — time only, left-aligned
-            ═══════════════════════════ */
-            const sbY = 20;
-            ctx.fillStyle = '#e8eaed';
-            ctx.font = '500 14px Roboto,sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText(d.sbTime, 18, sbY);
-
-            /* ═══════════════════════════
-               BACK ARROW  (left)
-            ═══════════════════════════ */
-            const navY = STATUS_H + 30;
-            ctx.strokeStyle = '#e8eaed'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-            ctx.beginPath();
-            ctx.moveTo(30, navY); ctx.lineTo(20, navY + 8); ctx.lineTo(30, navY + 16);
-            ctx.stroke();
-
-            /* flag icon (right) */
-            ctx.fillStyle = '#9aa0a6';
-            ctx.font = '400 18px Roboto,sans-serif';
-            ctx.textAlign = 'right';
-            ctx.fillText('⚑', W - 44, navY + 14);
-
-            /* 3-dot menu */
-            const dotX = W - 16, dotY = navY + 7;
-            [0, 5, 10].forEach(dy => {
-                ctx.beginPath();
-                ctx.arc(dotX, dotY + dy, 2, 0, Math.PI * 2);
-                ctx.fillStyle = '#9aa0a6'; ctx.fill();
-            });
-
-            /* ═══════════════════════════
-               AVATAR CIRCLE (profile pic or initials)
-            ═══════════════════════════ */
-            const AVX = W / 2, AVY = STATUS_H + 90, AVR = 36;
-
-            if (imgCache.profPrev) {
-                /* draw image cropped to circle */
-                drawCircleImage(ctx, imgCache.profPrev, AVX, AVY, AVR);
-                /* thin border */
-                ctx.strokeStyle = '#333'; ctx.lineWidth = 1;
-                ctx.beginPath(); ctx.arc(AVX, AVY, AVR, 0, Math.PI * 2); ctx.stroke();
-            } else {
-                ctx.fillStyle = '#1a3a5c';
-                ctx.beginPath(); ctx.arc(AVX, AVY, AVR, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#5aaee0';
-                ctx.font = '700 28px Roboto,sans-serif';
-                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText((d.rName[0] || 'I').toUpperCase(), AVX, AVY + 1);
-                ctx.textBaseline = 'alphabetic';
-            }
-
-            /* ═══════════════════════════
-               "To Imran Raza"
-            ═══════════════════════════ */
-            const nameY = AVY + AVR + 22;
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '400 19px Roboto,sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('To ' + d.rName, W / 2, nameY);
-
-            /* phone number */
-            ctx.fillStyle = '#9aa0a6';
-            ctx.font = '400 13px Roboto,sans-serif';
-            ctx.fillText(d.rPhone, W / 2, nameY + 22);
-
-            /* ═══════════════════════════
-               AMOUNT
-            ═══════════════════════════ */
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '300 58px Roboto,sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('₹' + fmtINR(d.amt), W / 2, nameY + 88);
-
-            /* ═══════════════════════════
-               PAY AGAIN PILL
-            ═══════════════════════════ */
-            const pW = 128, pH = 38, pX = W / 2 - pW / 2, pY = nameY + 100;
-            ctx.fillStyle = '#1c3e6b';
-            rr(ctx, pX, pY, pW, pH, 19); ctx.fill();
-            ctx.fillStyle = '#82b4f5';
-            ctx.font = '400 15px Roboto,sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('Pay again', W / 2, pY + 25);
-
-            /* ═══════════════════════════
-               COMPLETED ROW
-            ═══════════════════════════ */
-            const cY = pY + pH + 28;
-            const ckX = W / 2 - 55;
-            /* green filled circle */
-            ctx.fillStyle = '#34a853';
-            ctx.beginPath(); ctx.arc(ckX, cY, 10, 0, Math.PI * 2); ctx.fill();
-            /* white checkmark */
-            ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-            ctx.beginPath();
-            ctx.moveTo(ckX - 4, cY + 0.5);
-            ctx.lineTo(ckX - 1, cY + 4);
-            ctx.lineTo(ckX + 5.5, cY - 3.5);
-            ctx.stroke();
-            /* "Completed" text */
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '400 15px Roboto,sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText('Completed', W / 2 - 41, cY + 6);
-
-            /* thin horizontal divider */
-            ctx.strokeStyle = '#2a2a2a'; ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(50, cY + 20); ctx.lineTo(W - 50, cY + 20);
-            ctx.stroke();
-
-            /* date — centered, lighter grey, matches screenshot */
-            ctx.fillStyle = '#9aa0a6';
-            ctx.font = '400 14px Roboto,sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(fmtGP(dt), W / 2, cY + 40);
-
-            /* ═══════════════════════════
-               CARD (dark rounded card)
-            ═══════════════════════════ */
-            const CX = 16, CW = W - 32;
-            ctx.fillStyle = '#1a1a1a';
-            rr(ctx, CX, CARD_Y, CW, cardH, 16); ctx.fill();
-
-            /* ── BANK HEADER ROW ── */
-            const BLX = CX + 14, BLY = CARD_Y + 14;
-            const LOGO_W = 56, LOGO_H = 36;  /* rectangular, matches screenshot */
-
-            if (imgCache.bankPrev) {
-                ctx.fillStyle = '#ffffff';
-                rr(ctx, BLX, BLY, LOGO_W, LOGO_H, 7); ctx.fill();
-                ctx.save();
-                rr(ctx, BLX, BLY, LOGO_W, LOGO_H, 7); ctx.clip();
-                ctx.drawImage(imgCache.bankPrev, BLX, BLY, LOGO_W, LOGO_H);
-                ctx.restore();
-            } else {
-                /* white rounded rect */
-                ctx.fillStyle = '#ffffff';
-                rr(ctx, BLX, BLY, LOGO_W, LOGO_H, 7); ctx.fill();
-                /* purple "slice" */
-                ctx.fillStyle = '#9c27b0';
-                ctx.font = '700 13px Roboto,sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('slice', BLX + LOGO_W / 2, BLY + 15);
-                /* tiny "small finance bank" below */
-                ctx.font = '400 5.5px Roboto,sans-serif';
-                ctx.fillStyle = '#9c27b0';
-                ctx.fillText('small finance bank', BLX + LOGO_W / 2, BLY + 24);
-            }
-
-            /* bank name — bold white */
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '600 14px Roboto,sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText(d.sBank, BLX + LOGO_W + 12, BLY + 14);
-            /* account last 4 — grey */
-            ctx.fillStyle = '#9aa0a6';
-            ctx.font = '400 13px Roboto,sans-serif';
-            ctx.fillText(d.sAcct, BLX + LOGO_W + 12, BLY + 30);
-
-            /* chevron down (right side) */
-            const arX = CX + CW - 20, arY = BLY + LOGO_H / 2;
-            ctx.strokeStyle = '#666'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-            ctx.beginPath();
-            ctx.moveTo(arX - 6, arY - 3); ctx.lineTo(arX, arY + 3); ctx.lineTo(arX + 6, arY - 3);
-            ctx.stroke();
-
-            /* divider under bank header */
-            ctx.strokeStyle = '#2a2a2a'; ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(CX + 12, CARD_Y + CARD_HEADER_H);
-            ctx.lineTo(CX + CW - 12, CARD_Y + CARD_HEADER_H);
-            ctx.stroke();
-
-            /* ── TRANSACTION ROWS ── */
-            let ry = CARD_Y + CARD_HEADER_H + 14;
-
-            rows.forEach(r => {
-                ctx.fillStyle = '#ffffff';
-                ctx.font = '600 13.5px Roboto,sans-serif';
-                ctx.textAlign = 'left';
-                const lblLines = wrapLines(ctx, r.lbl, CW - 32);
-                lblLines.forEach((ln, i) => ctx.fillText(ln, CX + 16, ry + i * LINE_H));
-
-                ctx.fillStyle = '#7a8085';
-                ctx.font = '400 12px Roboto,sans-serif';
-                const valLines = wrapLines(ctx, r.val, CW - 32);
-                valLines.forEach((ln, i) => ctx.fillText(ln, CX + 16, ry + lblLines.length * LINE_H + i * LINE_H));
-                ry += lblLines.length * LINE_H + valLines.length * LINE_H + ROW_PAD;
-            });
-
-            /* ── FOOTER: POWERED BY UPI ── */
-            const fY = CARD_Y + cardH - FOOTER_H + 6;
-            ctx.strokeStyle = '#242424'; ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.moveTo(CX + 12, fY); ctx.lineTo(CX + CW - 12, fY); ctx.stroke();
-
-            ctx.fillStyle = '#777';
-            ctx.font = '400 9px Roboto,sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('POWERED BY', W / 2 - 22, fY + 14);
-            ctx.fillStyle = '#f97316';
-            ctx.font = '700 13px Roboto,sans-serif';
-            ctx.fillText('UPI▸▸', W / 2 + 22, fY + 14);
-
-            /* ═══════════════════════════
-               BOTTOM ACTION BAR
-            ═══════════════════════════ */
-            const barY = TOTAL_H - BOTTOM_H - 10;
-            ctx.fillStyle = '#1a1a1a';
-            rr(ctx, 12, barY, W - 24, 46, 23); ctx.fill();
-
-            const actions = ['? Having issues?', '⇄ Share', '👥 Split expens…'];
-            const bW = (W - 24 - 32) / 3;
-            actions.forEach((a, i) => {
-                const bx = 12 + 14 + i * (bW + 2);
-                ctx.fillStyle = '#2a2a2a';
-                rr(ctx, bx, barY + 7, bW, 32, 16); ctx.fill();
-                ctx.fillStyle = '#d0d3d8';
-                ctx.font = '400 10.5px Roboto,sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(a, bx + bW / 2, barY + 28);
-            });
-
-            /* ═══════════════════════════
-               BOTTOM NAV BAR (≡ ○ <)
-            ═══════════════════════════ */
-            const navBY = TOTAL_H - 14;
-            ['≡', '○', '‹'].forEach((icon, i) => {
-                ctx.fillStyle = '#888';
-                ctx.font = '400 16px Roboto,sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(icon, W / 4 + i * W / 4, navBY);
-            });
-
-            return cv;
-        }
-
-        /* ── UI Wiring ── */
-        let lastUrl = '', lastFile = '';
-
-        function getInputs() {
-            return {
-                rName: $('rName').value.trim() || 'Unknown',
-                rPhone: $('rPhone').value.trim(),
-                rUpi: $('rUpi').value.trim(),
-                rApp: $('rApp').value.trim(),
-                amt: parseFloat($('amt').value) || 0,
-                txnId: $('txnId').value.trim(),
-                sName: $('sName').value.trim(),
-                sBank: $('sBank').value.trim(),
-                sAcct: $('sAcct').value.trim(),
-                sUpi: $('sUpi').value.trim(),
-                sApp: $('sApp').value.trim(),
-                sbTime: $('sbTime').value.trim(),
-            };
-        }
-
-        function onBankSelect() {
-            const sel = document.getElementById('sBankSelect');
-            const inp = document.getElementById('sBank');
-            if (sel.value === 'custom') {
-                inp.style.display = 'block';
-                inp.value = '';
-                inp.focus();
-            } else {
-                inp.style.display = 'none';
-                inp.value = sel.value;
-            }
+        function getBank() {
+            return $('sBankSel').value === 'custom' ? $('sBank').value.trim() : $('sBankSel').value;
         }
 
         function generate() {
-            /* Refresh date/time fields and generate a fresh UPI transaction ID */
-            fillNow();
-            $('txnId').value = genTxnId();
-            const d = getInputs(), dt = getDate();
-            const cv = drawReceipt(d, dt);
-            lastUrl = cv.toDataURL('image/png');
-            lastFile = 'gpay_receipt_' + Date.now() + '.png';
-            $('prevImg').src = lastUrl;
-            $('formEl').style.display = 'none';
-            $('resultEl').classList.add('show');
+            const rName = $('rName').value.trim() || 'Unknown';
+            const rPhone = $('rPhone').value.trim();
+            const rUpi = $('rUpi').value.trim();
+            const rApp = $('rApp').value.trim();
+            const amt = parseFloat($('amt').value || 0).toLocaleString('en-IN');
+            const sName = $('sName').value.trim();
+            const sBank = getBank();
+            const sAcct = $('sAcct').value.trim();
+            const sUpi = $('sUpi').value.trim();
+            const sApp = $('sApp').value.trim();
+
+            // $('d-sbTime').textContent = $('sbTime').value.trim();
+
+            const av = $('d-avatar');
+            if (profileSrc) { av.innerHTML = '<img src="' + profileSrc + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'; }
+            else { av.textContent = (rName[0] || '?').toUpperCase(); }
+
+            $('d-toName').textContent = 'To ' + rName;
+            $('d-toPhone').textContent = rPhone;
+            $('d-amt').textContent = amt;
+            $('d-date').textContent = fmtDate($('txDate').value, $('txTime').value);
+            $('d-bankName').textContent = sBank;
+            $('d-bankAcct').textContent = sAcct;
+
+            const bl = $('d-bankLogo');
+            if (bankSrc) { bl.innerHTML = '<img src="' + bankSrc + '" style="width:100%;height:100%;object-fit:contain;">'; }
+            else {
+                const s = sBank.split(' ')[0].toLowerCase();
+                bl.innerHTML = '<div class="blogo-txt">' + s + '<span class="blogo-sub">' + sBank.toLowerCase() + '</span></div>';
+            }
+
+            $('d-txnId').textContent = $('txnId').value.trim();
+            $('d-toLbl').textContent = 'To: ' + (rName.split(' ')[0] || rName) + ' .';
+            $('d-toVal').textContent = rApp + ' \u2022 ' + rUpi;
+            $('d-fromLbl').textContent = 'From: ' + sName + ' (' + sBank + ')';
+            $('d-fromVal').textContent = sApp + ' \u2022 ' + sUpi;
+
+            $('v-form').classList.remove('active');
+            $('v-receipt').classList.add('active');
             window.scrollTo(0, 0);
         }
 
-        function dlReceipt() {
-            if (!lastUrl) return;
-            const a = document.createElement('a');
-            a.href = lastUrl; a.download = lastFile;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        }
-
-        function resetUI() {
-            $('formEl').style.display = 'block';
-            $('resultEl').classList.remove('show');
-            $('prevImg').src = ''; lastUrl = '';
-            fillNow();
+        function goBack() {
+            $('v-receipt').classList.remove('active');
+            $('v-form').classList.add('active');
             window.scrollTo(0, 0);
         }
+
+        function downloadReceipt() {
+            const el = $('receiptCapture');
+            html2canvas(el, { scale: 3, backgroundColor: '#0d0d0d', useCORS: true, logging: false }).then(cv => {
+                const a = document.createElement('a');
+                a.href = cv.toDataURL('image/png');
+                a.download = 'gpay_receipt_' + Date.now() + '.png';
+                a.click();
+            });
+        }
+
+        init();
     </script>
 </body>
 
